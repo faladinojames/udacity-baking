@@ -8,8 +8,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.faladionojames.bakingapp.Constants;
+import com.faladionojames.bakingapp.MainActivity;
 import com.faladionojames.bakingapp.Manager;
 import com.faladionojames.bakingapp.R;
 import com.faladionojames.bakingapp.RecipeStepsActivity;
@@ -33,22 +41,44 @@ import java.util.Random;
 
 public class Provider extends AppWidgetProvider {
 
-    private static final String ACTION_CLICK = "ACTION_CLICK";
+
+    Manager manager;
+    AppWidgetManager appWidgetManager;
+    int[] appWidgetIds;
+    Context context;
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager,
                          int[] appWidgetIds) {
 
-        Recipe recipe = getRecipes(context).get(new Manager(context).getLastViewedRecipe());
+
+        this.context=context;
+        this.appWidgetManager=appWidgetManager;
+        this.appWidgetIds=appWidgetIds;
+        manager= new Manager(context);
+
+        if(manager.getRecipes()==null)
+        {
+            getRecipes(context);
+        }
+
+        else{
+                loadIngredients(manager.getRecipes().get(manager.getLastViewedRecipe()));
+            }
+        }
+
+
+
+
+    private void loadIngredients(Recipe recipe) {
         ComponentName thisWidget = new ComponentName(context,
                 Provider.class);
         int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
         for (int widgetId : allWidgetIds) {
-            String s="";
+            String s = "";
 
-            for(Ingredient ingredient : recipe.getIngredients())
-            {
-                s+=ingredient.getIngredient()+"\n";
+            for (Ingredient ingredient : recipe.getIngredients()) {
+                s += ingredient.getIngredient() + "\n";
             }
 
             RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
@@ -67,40 +97,34 @@ public class Provider extends AppWidgetProvider {
         }
 
     }
-
-    protected List<Recipe> getRecipes(Context context)
+    protected void getRecipes(final Context context)
     {
-        String s="";
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(
-                    new InputStreamReader(context.getAssets().open("baking.json")));
 
-            String mLine;
-            while ((mLine = reader.readLine()) != null) {
-                s+=mLine;
+
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(context);
+
+
+// Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        manager.storeRecipes(response);
+                        loadIngredients(manager.getRecipes().get(manager.getLastViewedRecipe()));
+
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                Toast.makeText(context, "Unable to load recipes, please check your network", Toast.LENGTH_SHORT).show();
             }
+        });
+// Add the request to the RequestQueue.
+        queue.add(stringRequest);
 
-            JSONArray jsonArray = new JSONArray(s);
-            List<Recipe> recipes = new ArrayList<>();
 
-            for(int i=0; i<jsonArray.length(); i++)
-            {
-                recipes.add(new Recipe(jsonArray.getJSONObject(i)));
-            }
-
-            return recipes;
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
-        } finally {
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return null;
     }
 }

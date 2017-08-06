@@ -25,6 +25,15 @@ public class Recipe {
 
     }
 
+    public String getThumbnail()
+    {
+        try{
+            return jsonObject.getString("image");
+        }
+        catch (JSONException e){e.printStackTrace();}
+        return null;
+    }
+
     public String getJSONString()
     {
         return jsonObject.toString();
@@ -79,7 +88,7 @@ public class Recipe {
             for(int i=0; i<jsonArray.length(); i++)
             {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                recipeSteps.add(new RecipeStep(jsonObject.getInt(Constants.ID),jsonObject.getString(Constants.SHORT_DESCRIPTION),jsonObject.getString(Constants.DESCRIPTION),jsonObject.getString(Constants.VIDEO_URL)));
+                recipeSteps.add(new RecipeStep(jsonObject.getInt(Constants.ID),jsonObject.getString(Constants.SHORT_DESCRIPTION),jsonObject.getString(Constants.DESCRIPTION),jsonObject.getString(Constants.VIDEO_URL),jsonObject.getString("thumbnailURL")));
             }
             return recipeSteps;
         }

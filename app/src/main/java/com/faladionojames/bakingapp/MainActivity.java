@@ -7,6 +7,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -64,44 +65,29 @@ public class MainActivity extends BakingActivity {
 
     public void loadRecipes()
     {
-
-
-        new AsyncTask<Void,Void,String>(){
-            @Override
-            protected String doInBackground(Void... params) {
-                // Instantiate the RequestQueue.
-                RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
 
 
 // Request a string response from the provided URL.
-                StringRequest stringRequest = new StringRequest(Request.Method.GET, "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json",
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                
-                                onPostExecute(response);
-
-                            }
-                        }, new Response.ErrorListener() {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json",
+                new Response.Listener<String>() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        error.printStackTrace();
-                    }
-                });
-// Add the request to the RequestQueue.
-                queue.add(stringRequest);
-                return null;
-            }
+                    public void onResponse(String response) {
 
+                        manager.storeRecipes(response);
+                        setUpAdapter(manager.getRecipes());
+
+                    }
+                }, new Response.ErrorListener() {
             @Override
-            protected void onPostExecute(String s) {
-                if(s!=null) {
-                    manager.storeRecipes(s);
-                    setUpAdapter(manager.getRecipes());
-                    
-                }
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                Toast.makeText(MainActivity.this, "A network error occurre. Please restart the app.", Toast.LENGTH_SHORT).show();
             }
-        }.execute();
+        });
+// Add the request to the RequestQueue.
+        queue.add(stringRequest);
 
     }
 

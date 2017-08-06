@@ -3,12 +3,15 @@ package com.faladionojames.bakingapp.adapters;
 import android.app.Activity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.faladionojames.bakingapp.R;
 import com.faladionojames.bakingapp.models.Recipe;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 import java.util.Random;
@@ -33,7 +36,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<ViewHolder> {
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(activity.getLayoutInflater().inflate(R.layout.recipe_item,parent,false));
+        return new ViewHolder(activity.getLayoutInflater().inflate(R.layout.recipe_main_item,parent,false));
     }
 
     @Override
@@ -43,6 +46,12 @@ public class RecipesAdapter extends RecyclerView.Adapter<ViewHolder> {
         holder.cardView.setCardBackgroundColor(getBackground(recipe));
         holder.itemView.setTag(recipe);
         holder.itemView.setOnClickListener(listener);
+
+        if(TextUtils.isEmpty(recipe.getThumbnail()))
+        {
+            holder.image.setVisibility(View.GONE);
+        }
+        else Picasso.with(activity).load(recipe.getThumbnail()).into(holder.image);
 
     }
 
@@ -63,6 +72,8 @@ class ViewHolder extends RecyclerView.ViewHolder{
     TextView name;
     @InjectView(R.id.card)
     CardView cardView;
+    @InjectView(R.id.image)
+    ImageView image;
     ViewHolder(View v)
     {
         super(v);

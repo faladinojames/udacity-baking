@@ -23,7 +23,7 @@ public class RecipeStepDetailActivity extends BakingActivity {
     RelativeLayout layout;
 
     public static Recipe recipe;
-    static RecipeStep recipeStep;
+    RecipeStep recipeStep;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

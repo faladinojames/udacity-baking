@@ -37,7 +37,7 @@ public class Manager {
     public void storeLastViewedRecipe(int id)
     {
         editor.putInt("last",id);
-        editor.commit();
+        editor.apply();
     }
 
     public int getLastViewedRecipe()

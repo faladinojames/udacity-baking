@@ -1,13 +1,17 @@
 package com.faladionojames.bakingapp.adapters;
 
 import android.app.Activity;
+import android.support.v4.text.TextUtilsCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.faladionojames.bakingapp.R;
 import com.faladionojames.bakingapp.models.RecipeStep;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -49,6 +53,12 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<StepViewHolder> {
             holder.name.setText(recipeStep.getShortDesc());
             holder.itemView.setTag(recipeStep);
             holder.itemView.setOnClickListener(listener);
+
+            if(TextUtils.isEmpty(recipeStep.getThumbnail()))
+            {
+                holder.image.setVisibility(View.GONE);
+            }
+            else Picasso.with(activity).load(recipeStep.getThumbnail()).into(holder.image);
         }
 
 
@@ -63,6 +73,8 @@ public class RecipeDetailsAdapter extends RecyclerView.Adapter<StepViewHolder> {
 class StepViewHolder extends RecyclerView.ViewHolder{
     @InjectView(R.id.name)
     TextView name;
+    @InjectView(R.id.image)
+    ImageView image;
     public StepViewHolder(View view)
     {
         super(view);
