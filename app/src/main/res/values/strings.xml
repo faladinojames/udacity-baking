@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Baking App</string>
+
+    <bool name="isTablet">false</bool>
+    <string name="title_recipe_list">Recipes</string>
+    <string name="title_recipe_detail">Recipe Detail</string>
+    
+    <string name="prev">Previous</string>
+    <string name="next">Next</string>
+</resources>
